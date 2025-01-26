@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <windows.h>
 
-#define PASSTHROUGH_BUFFER_SIZE 4096
+// 4 MiB
+#define PASSTHROUGH_BUFFER_SIZE 4<<20
 
 #define PIPE_PATH_PREFIX "\\\\.\\pipe\\"
 

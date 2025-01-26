@@ -91,7 +91,7 @@ BOOL wait_for_pipe_client(HANDLE pipe)
 
 BOOL run_passthrough(HANDLE reader, HANDLE writer)
 {
-	char buffer[PASSTHROUGH_BUFFER_SIZE];
+	char* buffer = malloc(PASSTHROUGH_BUFFER_SIZE);
 
 	DWORD readLen;
 	DWORD wroteLen;
@@ -99,7 +99,7 @@ BOOL run_passthrough(HANDLE reader, HANDLE writer)
 
 	for(;;)
 	{
-		result = ReadFile(reader, buffer, sizeof(buffer), &readLen, NULL);
+		result = ReadFile(reader, buffer, PASSTHROUGH_BUFFER_SIZE, &readLen, NULL);
 
 		if(result) {
 			result = WriteFile(writer, buffer, readLen, &wroteLen, NULL);
@@ -110,6 +110,7 @@ BOOL run_passthrough(HANDLE reader, HANDLE writer)
 			}
 			else {
 				int err = GetLastError();
+				free(buffer);
 				if(err == ERROR_BROKEN_PIPE) {
 					pinfo("Output stream disconnected.");
 					return TRUE;
@@ -126,6 +127,7 @@ BOOL run_passthrough(HANDLE reader, HANDLE writer)
 		}
 		else {
 			int err = GetLastError();
+			free(buffer);
 			if(err == ERROR_BROKEN_PIPE) {
 				// Client disconnected.
 				// This is more like an EOF than an error.
